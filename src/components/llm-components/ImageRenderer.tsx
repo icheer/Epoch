@@ -126,6 +126,8 @@ export function ImageRenderer({
         height={fit === "cover" && isInFlexRow ? 400 : 600}
         className={cn(fitClasses[fit])}
         style={{ borderRadius: `${radius}px` }}
+        loading="lazy"
+        referrerPolicy="no-referrer"
       />
     </div>
   );

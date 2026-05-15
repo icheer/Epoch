@@ -88,6 +88,7 @@ export function HeroRenderer({
                   alt=""
                   className="w-full h-full object-cover"
                   loading="lazy"
+                  referrerPolicy="no-referrer"
                 />
                 <div
                   className="absolute inset-0"

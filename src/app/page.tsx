@@ -293,7 +293,6 @@ export default function Home() {
                     )}
                   </CardContent>
                 </Card>
-              )
             )}
 
             {/* Example prompts — only shown after the initial greeting */}

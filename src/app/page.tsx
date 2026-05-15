@@ -320,9 +320,9 @@ export default function Home() {
             className="flex flex-row space-x-2 md:-translate-x-6"
             aria-busy="true"
           >
-            <Avatar className="size-8 mt-4 shrink-0">
-              <div className="bg-brand size-8 rounded-full" />
-            </Avatar>
+            <div className="size-8 mt-4 shrink-0 rounded-full bg-brand flex items-center justify-center shadow-sm ring-2 ring-offset-1 ring-brand/25 select-none">
+              <span className="text-brand-foreground text-[11px] font-black leading-none tracking-tight">E</span>
+            </div>
             <Card className="flex-1 shadow-none bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800 min-w-0">
               <CardContent className="text-gray-600 dark:text-gray-300 text-sm font-[450] px-3 md:px-5">
                 <div className="space-y-4">

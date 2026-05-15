@@ -44,13 +44,13 @@ export function FlexRenderer({
     evenly: "justify-evenly",
   };
 
+  const effectiveAlign =
+    direction === "row" && align === "stretch" ? "center" : align;
+
   const className = cn(
     "flex",
     directionClasses[direction],
-    alignClasses[align],
-    // For row direction, default stretch → center on desktop so mixed-height items
-    // (e.g. a small badge next to a taller button) share a vertical midline.
-    direction === "row" && align === "stretch" && "sm:items-center",
+    alignClasses[effectiveAlign],
     justifyClasses[justify],
     wrap && "flex-wrap",
   );

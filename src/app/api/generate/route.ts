@@ -15,12 +15,16 @@ export const POST = async (request: Request) => {
   if (process.env.USE_OPENAI === "true") {
     const openai = createOpenAI({
       apiKey: process.env.OPENAI_API_KEY || "",
+      baseURL: process.env.OPENAI_API_URL || "https://api.openai.com/v1"
     });
 
-    model = openai(process.env.MODEL_NAME || "gpt-4.1-mini");
+    model = openai.chat(process.env.MODEL_NAME || "gpt-4.1-mini");
   } else if (process.env.USE_OLLAMA === "true") {
     const ollama = createOllama({
       baseURL: process.env.OLLAMA_API_URL || "http://localhost:11434/api",
+      headers: {
+        "Authorization": `Bearer ${process.env.OLLAMA_API_KEY || "dummy"}`,
+      }
     });
 
     model = ollama(process.env.MODEL_NAME || "gpt-oss:120b-cloud");

@@ -6,19 +6,34 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowUp, Square } from "lucide-react";
 import { UIRenderer, ResponseRoot } from "@/components/llm-components";
+import { ThemeToggle } from "@/components/theme-toggle";
+
+const EXAMPLE_PROMPTS = [
+  "展示全球主要城市的天气比较",
+  "创建一个待办事项管理界面",
+  "用图表分析 AI 行业发展趋势",
+  "设计一个产品功能对比页面",
+];
 
 interface Message {
   role: "user" | "assistant";
   content: string | ResponseRoot;
   isAction?: boolean;
   actionLabel?: string;
+  isError?: boolean;
+}
+
+interface RetryState {
+  userMessage: string;
+  apiBase: Message[];
 }
 
 export default function Home() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "你好，今天想搜索点什么？",
+      content:
+        "你好，我是 Epoch。每次对话都会生成可交互的组件界面——按钮、表单、图表、图库，而不只是文字回复。试试下面的例子，或者直接输入你想探索的内容。",
     },
   ]);
   const [input, setInput] = useState("");
@@ -26,6 +41,7 @@ export default function Home() {
   const [currentStreamingResponse, setCurrentStreamingResponse] =
     useState<ResponseRoot | null>(null);
   const [formValues, setFormValues] = useState<Record<string, string>>({});
+  const [retryState, setRetryState] = useState<RetryState | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
@@ -33,23 +49,24 @@ export default function Home() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, currentStreamingResponse]);
 
-  const streamResponse = async (userMessage: string) => {
+  const streamResponse = async (userMessage: string, apiBase?: Message[]) => {
     setIsStreaming(true);
     setCurrentStreamingResponse(null);
+    setRetryState(null);
 
     const controller = new AbortController();
     abortControllerRef.current = controller;
 
+    const baseMessages = apiBase ?? messages;
     let latestResponse: ResponseRoot | null = null;
 
-    const apiMessages = messages.map((msg) => ({
+    const apiMessages = baseMessages.map((msg) => ({
       role: msg.role,
       content:
         typeof msg.content === "string"
           ? msg.content
           : JSON.stringify(msg.content),
     }));
-
     apiMessages.push({ role: "user", content: userMessage });
 
     try {
@@ -114,11 +131,13 @@ export default function Home() {
         }
       } else {
         console.error("Streaming error:", err);
+        setRetryState({ userMessage, apiBase: baseMessages });
         setMessages((prev) => [
           ...prev,
           {
             role: "assistant",
-            content: "响应出现错误，请重试。",
+            content: "响应出现错误，请检查网络或 API 配置后重试。",
+            isError: true,
           },
         ]);
       }
@@ -137,6 +156,20 @@ export default function Home() {
 
   const handleStop = () => {
     abortControllerRef.current?.abort();
+  };
+
+  const handleRetry = async () => {
+    if (!retryState || isStreaming) return;
+    const { userMessage, apiBase } = retryState;
+    setRetryState(null);
+    setMessages((prev) => prev.slice(0, -1));
+    await streamResponse(userMessage, apiBase);
+  };
+
+  const handleExamplePrompt = async (prompt: string) => {
+    if (isStreaming) return;
+    setMessages((prev) => [...prev, { role: "user", content: prompt }]);
+    await streamResponse(prompt);
   };
 
   const handleButtonAction = async (action: string, label: string) => {
@@ -171,6 +204,8 @@ export default function Home() {
 
   return (
     <main className="bg-background min-h-screen w-screen">
+      <ThemeToggle />
+
       <div
         role="log"
         aria-live="polite"
@@ -182,25 +217,43 @@ export default function Home() {
             {message.role === "user" ? (
               message.isAction ? (
                 <div className="flex items-center gap-1.5">
-                  <span className="text-xs text-gray-400">点击了</span>
-                  <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full border border-gray-200">
+                  <span className="text-xs text-gray-400 dark:text-gray-500">
+                    点击了
+                  </span>
+                  <span className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded-full border border-gray-200 dark:border-gray-700">
                     {message.actionLabel}
                   </span>
                 </div>
               ) : (
-                <p className="text-black/50 text-sm font-[450]">
+                <p className="text-black/50 dark:text-white/60 text-sm font-[450]">
                   {message.content as string}
                 </p>
               )
             ) : (
               <div className="flex flex-row space-x-2 md:-translate-x-6">
-                <Avatar className="size-6 mt-4 shrink-0">
-                  <div className="bg-linear-to-br from-pink-500 to-yellow-500 h-8 w-8 rounded-full" />
+                <Avatar className="size-8 mt-4 shrink-0">
+                  <div className="bg-brand size-8 rounded-full" />
                 </Avatar>
-                <Card className="flex-1 shadow-none bg-gray-50 border-gray-200 min-w-0">
-                  <CardContent className="text-gray-600 text-sm font-[450] px-3 md:px-5">
+                <Card className="flex-1 shadow-none bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800 min-w-0">
+                  <CardContent className="text-gray-600 dark:text-gray-300 text-sm font-[450] px-3 md:px-5">
                     {typeof message.content === "string" ? (
-                      <p className="leading-relaxed">{message.content}</p>
+                      message.isError ? (
+                        <div className="flex flex-col gap-3">
+                          <p className="text-red-500 dark:text-red-400 leading-relaxed">
+                            {message.content}
+                          </p>
+                          {retryState && index === messages.length - 1 && (
+                            <button
+                              onClick={handleRetry}
+                              className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 px-3 py-1.5 rounded-full w-fit transition-colors duration-150"
+                            >
+                              重试
+                            </button>
+                          )}
+                        </div>
+                      ) : (
+                        <p className="leading-relaxed">{message.content}</p>
+                      )
                     ) : (
                       <div className="space-y-4">
                         {message.content.children?.map((child, childIndex) => (
@@ -218,6 +271,22 @@ export default function Home() {
                 </Card>
               </div>
             )}
+
+            {/* Example prompts — only shown after the initial greeting */}
+            {index === 0 && messages.length === 1 && (
+              <div className="flex flex-wrap gap-2 mt-4 md:ml-10">
+                {EXAMPLE_PROMPTS.map((prompt) => (
+                  <button
+                    key={prompt}
+                    onClick={() => handleExamplePrompt(prompt)}
+                    disabled={isStreaming}
+                    className="text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 px-3 py-1.5 rounded-full transition-colors duration-150 disabled:opacity-50"
+                  >
+                    {prompt}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         ))}
 
@@ -226,11 +295,11 @@ export default function Home() {
             className="flex flex-row space-x-2 md:-translate-x-6"
             aria-busy="true"
           >
-            <Avatar className="size-6 mt-4 shrink-0">
-              <div className="bg-linear-to-br from-pink-500 to-yellow-500 h-8 w-8 rounded-full" />
+            <Avatar className="size-8 mt-4 shrink-0">
+              <div className="bg-brand size-8 rounded-full" />
             </Avatar>
-            <Card className="flex-1 shadow-none bg-gray-50 border-gray-200 min-w-0">
-              <CardContent className="text-gray-600 text-sm font-[450] px-3 md:px-5">
+            <Card className="flex-1 shadow-none bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800 min-w-0">
+              <CardContent className="text-gray-600 dark:text-gray-300 text-sm font-[450] px-3 md:px-5">
                 <div className="space-y-4">
                   {currentStreamingResponse.children?.map((child, index) => (
                     <UIRenderer
@@ -242,8 +311,8 @@ export default function Home() {
                     />
                   ))}
                 </div>
-                <div className="flex items-center gap-2 text-gray-400 text-xs mt-4">
-                  <div className="animate-spin h-3 w-3 border-2 border-gray-300 border-t-gray-600 rounded-full" />
+                <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500 text-xs mt-4">
+                  <div className="animate-spin h-3 w-3 border-2 border-gray-300 dark:border-gray-600 border-t-gray-600 dark:border-t-gray-300 rounded-full" />
                   <span>生成中...</span>
                 </div>
               </CardContent>
@@ -257,7 +326,7 @@ export default function Home() {
       <div className="fixed bottom-0 left-0 right-0 max-w-[802px] mx-auto px-4 md:px-0">
         <div className="absolute bottom-full left-0 right-0 h-8 bg-gradient-to-t from-background to-transparent pointer-events-none" />
         <div className="bg-background pt-1 pb-6 md:pb-8">
-          <div className="flex items-center gap-2 rounded-xl bg-gray-50 border border-gray-200 pr-2 pl-3 py-2.5">
+          <div className="flex items-center gap-2 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 pr-2 pl-3 py-2.5">
             <Textarea
               rows={1}
               value={input}
@@ -265,14 +334,14 @@ export default function Home() {
               onKeyDown={handleKeyDown}
               disabled={isStreaming}
               aria-label="输入消息"
-              className="flex-1 resize-none text-sm bg-transparent border-0 shadow-none py-0 px-0 placeholder:font-[490] placeholder:text-gray-400 text-gray-700 max-h-32 overflow-y-auto leading-relaxed"
+              className="flex-1 resize-none text-sm bg-transparent border-0 shadow-none py-0 px-0 placeholder:font-[490] placeholder:text-gray-400 dark:placeholder:text-gray-600 text-gray-700 dark:text-gray-200 max-h-32 overflow-y-auto leading-relaxed"
               placeholder="Ask anything..."
             />
             {isStreaming ? (
               <button
                 onClick={handleStop}
                 aria-label="停止生成"
-                className="bg-gray-800 text-white p-2 rounded-full text-sm font-medium shadow-sm hover:bg-gray-700 transition-colors duration-200 cursor-pointer shrink-0 self-end"
+                className="bg-gray-800 dark:bg-gray-600 text-white p-2 rounded-full text-sm font-medium shadow-sm hover:bg-gray-700 dark:hover:bg-gray-500 transition-colors duration-200 cursor-pointer shrink-0 self-end"
               >
                 <Square size={13} fill="currentColor" />
               </button>
@@ -281,7 +350,7 @@ export default function Home() {
                 onClick={handleSend}
                 disabled={!input.trim()}
                 aria-label="发送消息"
-                className="bg-gradient-to-br from-pink-500 to-yellow-500 text-white p-2 rounded-full text-sm font-medium shadow-sm hover:opacity-90 transition-opacity duration-200 cursor-pointer shrink-0 self-end disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-brand text-brand-foreground p-2 rounded-full text-sm font-medium shadow-sm hover:brightness-105 transition-[filter] duration-200 cursor-pointer shrink-0 self-end disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <ArrowUp size={13} />
               </button>

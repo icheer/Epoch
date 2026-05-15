@@ -4,19 +4,21 @@ import { useState, useRef, useEffect } from "react";
 import { Avatar } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowUp } from "lucide-react";
+import { ArrowUp, Square } from "lucide-react";
 import { UIRenderer, ResponseRoot } from "@/components/llm-components";
 
 interface Message {
   role: "user" | "assistant";
   content: string | ResponseRoot;
+  isAction?: boolean;
+  actionLabel?: string;
 }
 
 export default function Home() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "Hello, how may I help you today?",
+      content: "你好，今天想搜索点什么？",
     },
   ]);
   const [input, setInput] = useState("");
@@ -24,10 +26,19 @@ export default function Home() {
   const [currentStreamingResponse, setCurrentStreamingResponse] =
     useState<ResponseRoot | null>(null);
   const [formValues, setFormValues] = useState<Record<string, string>>({});
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, currentStreamingResponse]);
 
   const streamResponse = async (userMessage: string) => {
     setIsStreaming(true);
     setCurrentStreamingResponse(null);
+
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
 
     let latestResponse: ResponseRoot | null = null;
 
@@ -39,18 +50,14 @@ export default function Home() {
           : JSON.stringify(msg.content),
     }));
 
-    apiMessages.push({
-      role: "user",
-      content: userMessage,
-    });
+    apiMessages.push({ role: "user", content: userMessage });
 
     try {
       const response = await fetch("/api/generate", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages: apiMessages }),
+        signal: controller.signal,
       });
 
       if (!response.ok) {
@@ -60,13 +67,10 @@ export default function Home() {
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
 
-      if (!reader) {
-        throw new Error("No reader available");
-      }
+      if (!reader) throw new Error("No reader available");
 
       while (true) {
         const { done, value } = await reader.read();
-
         if (done) break;
 
         const chunk = decoder.decode(value, { stream: true });
@@ -81,10 +85,7 @@ export default function Home() {
                 const finalResponse: ResponseRoot = latestResponse;
                 setMessages((prev) => [
                   ...prev,
-                  {
-                    role: "assistant",
-                    content: finalResponse,
-                  },
+                  { role: "assistant", content: finalResponse },
                 ]);
               }
               setCurrentStreamingResponse(null);
@@ -103,15 +104,24 @@ export default function Home() {
           }
         }
       }
-    } catch (err) {
-      console.error("Streaming error:", err);
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content: "Sorry, an error occurred while processing your request.",
-        },
-      ]);
+    } catch (err: unknown) {
+      if (err instanceof Error && err.name === "AbortError") {
+        if (latestResponse) {
+          setMessages((prev) => [
+            ...prev,
+            { role: "assistant", content: latestResponse! },
+          ]);
+        }
+      } else {
+        console.error("Streaming error:", err);
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "assistant",
+            content: "响应出现错误，请重试。",
+          },
+        ]);
+      }
       setIsStreaming(false);
       setCurrentStreamingResponse(null);
     }
@@ -119,29 +129,33 @@ export default function Home() {
 
   const handleSend = async () => {
     if (!input.trim() || isStreaming) return;
-
     const userMessage = input.trim();
     setInput("");
-
     setMessages((prev) => [...prev, { role: "user", content: userMessage }]);
     await streamResponse(userMessage);
+  };
+
+  const handleStop = () => {
+    abortControllerRef.current?.abort();
   };
 
   const handleButtonAction = async (action: string, label: string) => {
     if (isStreaming) return;
 
-    let actionMessage = `User clicked button: "${label}"`;
-
+    let apiContent = `用户点击了按钮："${label}"`;
     if (Object.keys(formValues).length > 0) {
-      actionMessage +=
-        "\n\nForm data:\n" +
+      apiContent +=
+        "\n\n表单数据：\n" +
         Object.entries(formValues)
           .map(([key, value]) => `- ${key}: ${value}`)
           .join("\n");
     }
 
-    setMessages((prev) => [...prev, { role: "user", content: actionMessage }]);
-    await streamResponse(actionMessage);
+    setMessages((prev) => [
+      ...prev,
+      { role: "user", content: apiContent, isAction: true, actionLabel: label },
+    ]);
+    await streamResponse(apiContent);
   };
 
   const handleFormChange = (id: string, value: string) => {
@@ -156,18 +170,32 @@ export default function Home() {
   };
 
   return (
-    <div className="bg-white min-h-screen w-screen">
-      <div className="max-w-3xl mx-auto flex flex-col space-y-6 md:space-y-10 mt-6 md:mt-10 pb-32 md:pb-40 px-4 md:px-0">
+    <main className="bg-background min-h-screen w-screen">
+      <div
+        role="log"
+        aria-live="polite"
+        aria-label="对话历史"
+        className="max-w-3xl mx-auto flex flex-col space-y-6 md:space-y-10 mt-6 md:mt-10 pb-32 md:pb-40 px-4 md:px-0"
+      >
         {messages.map((message, index) => (
           <div key={index}>
             {message.role === "user" ? (
-              <p className="text-black/50 text-sm font-[450]">
-                {message.content as string}
-              </p>
+              message.isAction ? (
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs text-gray-400">点击了</span>
+                  <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full border border-gray-200">
+                    {message.actionLabel}
+                  </span>
+                </div>
+              ) : (
+                <p className="text-black/50 text-sm font-[450]">
+                  {message.content as string}
+                </p>
+              )
             ) : (
               <div className="flex flex-row space-x-2 md:-translate-x-6">
                 <Avatar className="size-6 mt-4 shrink-0">
-                  <div className="bg-linear-to-br from-pink-500 to-yellow-500 h-8 w-8 rounded-full"></div>
+                  <div className="bg-linear-to-br from-pink-500 to-yellow-500 h-8 w-8 rounded-full" />
                 </Avatar>
                 <Card className="flex-1 shadow-none bg-gray-50 border-gray-200 min-w-0">
                   <CardContent className="text-gray-600 text-sm font-[450] px-3 md:px-5">
@@ -194,9 +222,12 @@ export default function Home() {
         ))}
 
         {isStreaming && currentStreamingResponse && (
-          <div className="flex flex-row space-x-2 md:-translate-x-6">
+          <div
+            className="flex flex-row space-x-2 md:-translate-x-6"
+            aria-busy="true"
+          >
             <Avatar className="size-6 mt-4 shrink-0">
-              <div className="bg-linear-to-br from-pink-500 to-yellow-500 h-8 w-8 rounded-full"></div>
+              <div className="bg-linear-to-br from-pink-500 to-yellow-500 h-8 w-8 rounded-full" />
             </Avatar>
             <Card className="flex-1 shadow-none bg-gray-50 border-gray-200 min-w-0">
               <CardContent className="text-gray-600 text-sm font-[450] px-3 md:px-5">
@@ -213,17 +244,19 @@ export default function Home() {
                 </div>
                 <div className="flex items-center gap-2 text-gray-400 text-xs mt-4">
                   <div className="animate-spin h-3 w-3 border-2 border-gray-300 border-t-gray-600 rounded-full" />
-                  <span>Streaming...</span>
+                  <span>生成中...</span>
                 </div>
               </CardContent>
             </Card>
           </div>
         )}
+
+        <div ref={messagesEndRef} />
       </div>
 
       <div className="fixed bottom-0 left-0 right-0 max-w-[802px] mx-auto px-4 md:px-0">
-        <div className="absolute bottom-full left-0 right-0 h-8 bg-gradient-to-t from-white to-transparent pointer-events-none"></div>
-        <div className="bg-white pt-1 pb-6 md:pb-8">
+        <div className="absolute bottom-full left-0 right-0 h-8 bg-gradient-to-t from-background to-transparent pointer-events-none" />
+        <div className="bg-background pt-1 pb-6 md:pb-8">
           <div className="flex items-center gap-2 rounded-xl bg-gray-50 border border-gray-200 pr-2 pl-3 py-2.5">
             <Textarea
               rows={1}
@@ -231,19 +264,31 @@ export default function Home() {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               disabled={isStreaming}
+              aria-label="输入消息"
               className="flex-1 resize-none text-sm bg-transparent border-0 shadow-none py-0 px-0 placeholder:font-[490] placeholder:text-gray-400 text-gray-700 max-h-32 overflow-y-auto leading-relaxed"
               placeholder="Ask anything..."
             />
-            <button
-              onClick={handleSend}
-              disabled={isStreaming || !input.trim()}
-              className="bg-gradient-to-br from-pink-500 to-yellow-500 text-white p-2 rounded-full text-sm font-medium shadow-sm hover:opacity-90 transition duration-200 cursor-pointer shrink-0 self-end disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <ArrowUp size={13} />
-            </button>
+            {isStreaming ? (
+              <button
+                onClick={handleStop}
+                aria-label="停止生成"
+                className="bg-gray-800 text-white p-2 rounded-full text-sm font-medium shadow-sm hover:bg-gray-700 transition-colors duration-200 cursor-pointer shrink-0 self-end"
+              >
+                <Square size={13} fill="currentColor" />
+              </button>
+            ) : (
+              <button
+                onClick={handleSend}
+                disabled={!input.trim()}
+                aria-label="发送消息"
+                className="bg-gradient-to-br from-pink-500 to-yellow-500 text-white p-2 rounded-full text-sm font-medium shadow-sm hover:opacity-90 transition-opacity duration-200 cursor-pointer shrink-0 self-end disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <ArrowUp size={13} />
+              </button>
+            )}
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

@@ -257,7 +257,7 @@ export default function Home() {
             ) : (
               <div className="flex flex-row space-x-2 md:-translate-x-6">
                 <div className="size-8 mt-4 shrink-0 rounded-full bg-brand flex items-center justify-center shadow-sm ring-2 ring-offset-1 ring-brand/25 select-none">
-                  <span className="border-l-[16px] border-l-brand-foreground border-y-[11px] border-y-transparent ml-0.5" />
+                  <span className="border-b-[11px] border-b-brand-foreground border-x-[6.5px] border-x-transparent mb-0.5" />
                 </div>
                 <Card className="flex-1 shadow-none bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800 min-w-0">
                   <CardContent className="text-gray-600 dark:text-gray-300 text-sm font-[450] px-3 md:px-5">

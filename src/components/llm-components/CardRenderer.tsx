@@ -142,7 +142,7 @@ export function CardRenderer({
         )}
 
         {children.length > 0 && (
-          <div className="space-y-2">
+          <div className="flex flex-wrap items-center gap-2">
             {children.map((child, index) => (
               <UIRenderer
                 key={index}

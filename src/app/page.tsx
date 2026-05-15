@@ -250,17 +250,16 @@ export default function Home() {
                   </span>
                 </div>
               ) : (
-                <p className="text-black/50 dark:text-white/60 text-sm font-[450]">
-                  {message.content as string}
-                </p>
+                <div className="flex items-start gap-2 justify-end">
+                  <p className="text-black/50 dark:text-white/60 text-sm font-[450] mt-1">
+                    {message.content as string}
+                  </p>
+                  <div className="size-6 shrink-0 rounded-full bg-gray-200 dark:bg-gray-700 mt-0.5" />
+                </div>
               )
             ) : (
-              <div className="flex flex-row space-x-2 md:-translate-x-6">
-                <div className="size-8 mt-4 shrink-0 rounded-full bg-brand flex items-center justify-center shadow-sm ring-2 ring-offset-1 ring-brand/25 select-none">
-                  <span className="border-b-[11px] border-b-brand-foreground border-x-[6.5px] border-x-transparent mb-0.5" />
-                </div>
-                <Card className="flex-1 shadow-none bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800 min-w-0">
-                  <CardContent className="text-gray-600 dark:text-gray-300 text-sm font-[450] px-3 md:px-5">
+              <Card className="shadow-none bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800">
+                <CardContent className="text-gray-600 dark:text-gray-300 text-sm font-[450] px-3 md:px-5">
                     {typeof message.content === "string" ? (
                       message.isError ? (
                         <div className="flex flex-col gap-3">
@@ -294,12 +293,12 @@ export default function Home() {
                     )}
                   </CardContent>
                 </Card>
-              </div>
+              )
             )}
 
             {/* Example prompts — only shown after the initial greeting */}
             {index === 0 && messages.length === 1 && (
-              <div className="flex flex-wrap gap-2 mt-4 md:ml-10">
+              <div className="flex flex-wrap gap-2 mt-4">
                 {EXAMPLE_PROMPTS.map((prompt) => (
                   <button
                     key={prompt}
@@ -316,14 +315,8 @@ export default function Home() {
         ))}
 
         {isStreaming && currentStreamingResponse && (
-          <div
-            className="flex flex-row space-x-2 md:-translate-x-6"
-            aria-busy="true"
-          >
-            <div className="size-8 mt-4 shrink-0 rounded-full bg-brand flex items-center justify-center shadow-sm ring-2 ring-offset-1 ring-brand/25 select-none">
-              <span className="text-brand-foreground text-[11px] font-black leading-none tracking-tight">E</span>
-            </div>
-            <Card className="flex-1 shadow-none bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800 min-w-0">
+          <div aria-busy="true">
+            <Card className="shadow-none bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800">
               <CardContent className="text-gray-600 dark:text-gray-300 text-sm font-[450] px-3 md:px-5">
                 <div className="space-y-4">
                   {currentStreamingResponse.children?.map((child, index) => (

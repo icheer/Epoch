@@ -87,6 +87,7 @@ export function HeroRenderer({
                   src={imageUrl}
                   alt=""
                   className="w-full h-full object-cover"
+                  loading="lazy"
                 />
                 <div
                   className="absolute inset-0"

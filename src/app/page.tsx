@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Avatar } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -44,10 +44,38 @@ export default function Home() {
   const [retryState, setRetryState] = useState<RetryState | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const isNearBottomRef = useRef(true);
 
+  // Track whether user has scrolled away from the bottom
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, currentStreamingResponse]);
+    const onScroll = () => {
+      const distanceToBottom =
+        document.documentElement.scrollHeight -
+        window.scrollY -
+        window.innerHeight;
+      isNearBottomRef.current = distanceToBottom < 200;
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const scrollToBottom = useCallback((force = false) => {
+    if (force || isNearBottomRef.current) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, []);
+
+  // Always scroll when a completed message is added (user sent or AI done)
+  useEffect(() => {
+    scrollToBottom(true);
+  }, [messages, scrollToBottom]);
+
+  // During streaming, only scroll if user is already near the bottom
+  useEffect(() => {
+    if (currentStreamingResponse) {
+      scrollToBottom(false);
+    }
+  }, [currentStreamingResponse, scrollToBottom]);
 
   const streamResponse = async (userMessage: string, apiBase?: Message[]) => {
     setIsStreaming(true);
@@ -203,14 +231,14 @@ export default function Home() {
   };
 
   return (
-    <main className="bg-background min-h-screen w-screen">
+    <main className="bg-background min-h-screen">
       <ThemeToggle />
 
       <div
         role="log"
         aria-live="polite"
         aria-label="对话历史"
-        className="max-w-3xl mx-auto flex flex-col space-y-6 md:space-y-10 mt-6 md:mt-10 pb-32 md:pb-40 px-4 md:px-0"
+        className="max-w-3xl 2xl:max-w-4xl mx-auto flex flex-col space-y-6 md:space-y-10 pt-6 md:pt-10 pb-32 md:pb-40 px-4 md:px-0"
       >
         {messages.map((message, index) => (
           <div key={index}>
@@ -323,7 +351,7 @@ export default function Home() {
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 max-w-[802px] mx-auto px-4 md:px-0">
+      <div className="fixed bottom-0 left-0 right-0 max-w-[802px] 2xl:max-w-[930px] mx-auto px-4 md:px-0">
         <div className="absolute bottom-full left-0 right-0 h-8 bg-gradient-to-t from-background to-transparent pointer-events-none" />
         <div className="bg-background pt-1 pb-6 md:pb-8">
           <div className="flex items-center gap-2 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 pr-2 pl-3 py-2.5">

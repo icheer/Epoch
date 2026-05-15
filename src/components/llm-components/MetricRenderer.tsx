@@ -9,63 +9,44 @@ interface MetricRendererProps {
 }
 
 export function MetricRenderer({ component }: MetricRendererProps) {
-  const {
-    label,
-    value,
-    change,
-    trend,
-    prefix,
-    suffix,
-    description,
-    variant = "default",
-  } = component;
+  const { label, value, change, trend, prefix, suffix, description } =
+    component;
 
   if (!value) return null;
 
-  const variantStyles = {
-    default: "bg-white border-gray-100",
-    primary: "bg-blue-50 border-blue-200",
-    success: "bg-green-50 border-green-200",
-    warning: "bg-yellow-50 border-yellow-200",
-    danger: "bg-red-50 border-red-200",
-  };
-
   const trendColor =
     trend === "up"
-      ? "text-green-600"
+      ? "text-emerald-600 dark:text-emerald-400"
       : trend === "down"
-        ? "text-red-600"
-        : "text-gray-500";
+        ? "text-red-500 dark:text-red-400"
+        : "text-muted-foreground";
 
   return (
-    <div
-      className={cn(
-        "rounded-xl border p-6 transition-all hover:shadow-md",
-        variantStyles[variant],
-      )}
-    >
+    <div className="pl-4 border-l-2 border-brand py-0.5">
       {label && (
-        <p className="text-sm font-medium text-gray-600 mb-2">{label}</p>
+        <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest mb-1">
+          {label}
+        </p>
       )}
 
-      <div className="flex items-baseline gap-2">
-        <span className="text-3xl font-bold text-gray-900">
+      <div className="flex items-baseline gap-3">
+        <span className="text-3xl font-bold tracking-tight text-foreground">
           {prefix}
           {value}
           {suffix}
         </span>
 
         {(change || trend) && (
-          <div className={cn("flex items-center gap-1 text-sm", trendColor)}>
-            {trend === "up" && <TrendingUp className="h-4 w-4" />}
-            {trend === "down" && <TrendingDown className="h-4 w-4" />}
+          <div className={cn("flex items-center gap-1 text-xs font-medium", trendColor)}>
+            {trend === "up" && <TrendingUp className="h-3.5 w-3.5" />}
+            {trend === "down" && <TrendingDown className="h-3.5 w-3.5" />}
             {change && <span>{change}</span>}
           </div>
         )}
       </div>
 
       {description && (
-        <p className="text-sm text-gray-500 mt-2">{description}</p>
+        <p className="text-xs text-muted-foreground mt-1">{description}</p>
       )}
     </div>
   );

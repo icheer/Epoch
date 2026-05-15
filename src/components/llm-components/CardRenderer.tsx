@@ -83,7 +83,7 @@ export function CardRenderer({
   return (
     <div
       className={cn(
-        "group relative rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl border border-gray-100 bg-white",
+        "group relative rounded-2xl overflow-hidden transition-[box-shadow,transform] duration-300 hover:shadow-xl border border-border bg-card dark:bg-card",
         clickAction &&
           "cursor-pointer hover:scale-[1.01] hover:-translate-y-0.5",
         isInGrid && "h-full flex flex-col",
@@ -100,7 +100,8 @@ export function CardRenderer({
                 <img
                   src={imageUrl}
                   alt={title || ""}
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  loading="lazy"
                 />
                 <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white/20" />
                 <div className="absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-white via-white/90 to-transparent" />

@@ -24,8 +24,8 @@ export function FlexRenderer({
   } = component;
 
   const directionClasses = {
-    row: "flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3",
-    column: "flex-col space-y-4",
+    row: "flex-col sm:flex-row gap-3",
+    column: "flex-col gap-4",
   };
 
   const alignClasses = {
@@ -48,6 +48,9 @@ export function FlexRenderer({
     "flex",
     directionClasses[direction],
     alignClasses[align],
+    // For row direction, default stretch → center on desktop so mixed-height items
+    // (e.g. a small badge next to a taller button) share a vertical midline.
+    direction === "row" && align === "stretch" && "sm:items-center",
     justifyClasses[justify],
     wrap && "flex-wrap",
   );

@@ -1,12 +1,10 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Avatar } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowUp, Square } from "lucide-react";
 import { UIRenderer, ResponseRoot } from "@/components/llm-components";
-import { ThemeToggle } from "@/components/theme-toggle";
 
 const EXAMPLE_PROMPTS = [
   "展示全球主要城市的天气比较",
@@ -232,7 +230,6 @@ export default function Home() {
 
   return (
     <main className="bg-background min-h-screen">
-      <ThemeToggle />
 
       <div
         role="log"
@@ -259,9 +256,9 @@ export default function Home() {
               )
             ) : (
               <div className="flex flex-row space-x-2 md:-translate-x-6">
-                <Avatar className="size-8 mt-4 shrink-0">
-                  <div className="bg-brand size-8 rounded-full" />
-                </Avatar>
+                <div className="size-8 mt-4 shrink-0 rounded-full bg-brand flex items-center justify-center shadow-sm ring-2 ring-offset-1 ring-brand/25 select-none">
+                  <span className="text-brand-foreground text-[11px] font-black leading-none tracking-tight">E</span>
+                </div>
                 <Card className="flex-1 shadow-none bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800 min-w-0">
                   <CardContent className="text-gray-600 dark:text-gray-300 text-sm font-[450] px-3 md:px-5">
                     {typeof message.content === "string" ? (

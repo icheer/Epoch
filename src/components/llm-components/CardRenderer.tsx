@@ -123,14 +123,14 @@ export function CardRenderer({
                   referrerPolicy="no-referrer"
                   onError={() => setImageError(true)}
                 />
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white/30" />
-                <div className="absolute inset-x-0 bottom-0 h-full bg-gradient-to-t from-white via-white/95 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white/20" />
+                <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-white via-white/90 to-transparent" />
                 <div
-                  className="absolute inset-x-0 bottom-0 h-3/5"
+                  className="absolute inset-x-0 bottom-0 h-1/3"
                   style={{
                     backdropFilter: "blur(1px)",
                     background:
-                      "linear-gradient(to top, rgba(255,255,255,1) 0%, rgba(255,255,255,0.98) 30%, rgba(255,255,255,0.85) 50%, rgba(255,255,255,0) 100%)",
+                      "linear-gradient(to top, rgba(255,255,255,1) 0%, rgba(255,255,255,0.98) 40%, rgba(255,255,255,0.8) 70%, rgba(255,255,255,0) 100%)",
                   }}
                 />
               </div>

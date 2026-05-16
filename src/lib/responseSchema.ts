@@ -94,6 +94,8 @@ const ResponseComponent = (() => {
             .enum(["text", "email", "password", "number", "tel", "url"])
             .default("text"),
           required: z.boolean().default(false),
+          error: z.string().default(""),
+          helperText: z.string().default(""),
         })
         .strict(),
 
@@ -105,6 +107,8 @@ const ResponseComponent = (() => {
           placeholder: z.string().default(""),
           rows: z.number().int().min(2).max(20).default(4),
           required: z.boolean().default(false),
+          error: z.string().default(""),
+          helperText: z.string().default(""),
         })
         .strict(),
 
@@ -123,6 +127,8 @@ const ResponseComponent = (() => {
             )
             .min(1),
           required: z.boolean().default(false),
+          error: z.string().default(""),
+          helperText: z.string().default(""),
         })
         .strict(),
 
@@ -239,7 +245,7 @@ const ResponseComponent = (() => {
       z
         .object({
           type: z.literal("grid"),
-          columns: z.number().int().min(1).max(3).default(2),
+          columns: z.number().int().min(1).max(4).default(2),
           children: z.array(UIComponent).max(20).default([]),
         })
         .strict(),

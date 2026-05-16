@@ -113,7 +113,7 @@ export function HeroRenderer({
         )}
 
         {children.length > 0 && (
-          <div className="space-y-3 sm:space-y-4 mt-4">
+          <div className="space-y-3 sm:space-y-4 mt-4 [&_*]:!text-white [&_p]:!text-gray-200 [&_h1]:!text-white [&_h2]:!text-white [&_h3]:!text-white">
             {children.map((child, index) => (
               <UIRenderer
                 key={index}

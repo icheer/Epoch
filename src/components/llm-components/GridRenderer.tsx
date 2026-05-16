@@ -25,6 +25,7 @@ export function GridRenderer({
     1: "grid-cols-1",
     2: "grid-cols-1 md:grid-cols-2",
     3: "grid-cols-1 md:grid-cols-2 lg:grid-cols-3",
+    4: "grid-cols-2 md:grid-cols-3 lg:grid-cols-4",
   };
 
   return (
@@ -32,7 +33,7 @@ export function GridRenderer({
       className={cn(
         "grid gap-4",
         gridColsClass[
-          Math.min(3, Math.max(1, columns)) as keyof typeof gridColsClass
+          Math.min(4, Math.max(1, columns)) as keyof typeof gridColsClass
         ],
       )}
     >

@@ -30,6 +30,8 @@ export function SelectRenderer({
     placeholder = "Select an option",
     options,
     required = false,
+    error = "",
+    helperText = "",
   } = component;
 
   if (!id || !options || options.length === 0) return null;
@@ -37,6 +39,8 @@ export function SelectRenderer({
   const handleChange = (newValue: string) => {
     onChange?.(id, newValue);
   };
+
+  const hasError = error && error.trim() !== "";
 
   return (
     <div className={cn("space-y-2", isInFlexRow && "flex-1 min-w-0")}>
@@ -47,7 +51,10 @@ export function SelectRenderer({
         </Label>
       )}
       <Select value={value} onValueChange={handleChange}>
-        <SelectTrigger className="border-gray-300 focus:border-pink-500 focus:ring-pink-500">
+        <SelectTrigger className={cn(
+          "border-gray-300 focus:border-pink-500 focus:ring-pink-500",
+          hasError && "border-red-500 focus:border-red-500 focus:ring-red-500"
+        )}>
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent>
@@ -60,6 +67,12 @@ export function SelectRenderer({
             ))}
         </SelectContent>
       </Select>
+      {hasError && (
+        <p className="text-xs text-red-600 mt-1">{error}</p>
+      )}
+      {!hasError && helperText && (
+        <p className="text-xs text-gray-500 mt-1">{helperText}</p>
+      )}
     </div>
   );
 }

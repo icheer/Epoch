@@ -38,30 +38,39 @@ export function StatsRenderer({ component }: StatsRendererProps) {
               key={index}
               className="flex-1 sm:px-5 first:sm:pl-0 last:sm:pr-0"
             >
-              {item.label && (
-                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest mb-1">
-                  {item.label}
-                </p>
-              )}
-              {item.value && (
-                <p className={cn(
-                  "font-bold tracking-tight text-foreground",
-                  index === 0 ? "text-2xl" : "text-xl"
-                )}>
-                  {item.value}
-                </p>
-              )}
-              {(item.change || item.trend) && (
-                <div className={cn("flex items-center gap-1 text-xs font-medium mt-0.5", trendColor)}>
-                  {trendIcon}
-                  {item.change && <span>{item.change}</span>}
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex-1">
+                  {item.label && (
+                    <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest mb-1">
+                      {item.label}
+                    </p>
+                  )}
+                  {item.value && (
+                    <p className={cn(
+                      "font-bold tracking-tight text-foreground",
+                      index === 0 ? "text-2xl" : "text-xl"
+                    )}>
+                      {item.value}
+                    </p>
+                  )}
+                  {(item.change || item.trend) && (
+                    <div className={cn("flex items-center gap-1 text-xs font-medium mt-0.5", trendColor)}>
+                      {trendIcon}
+                      {item.change && <span>{item.change}</span>}
+                    </div>
+                  )}
+                  {item.description && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {item.description}
+                    </p>
+                  )}
                 </div>
-              )}
-              {item.description && (
-                <p className="text-xs text-muted-foreground mt-1">
-                  {item.description}
-                </p>
-              )}
+                {item.icon && (
+                  <div className="text-muted-foreground/40 mt-1">
+                    <span className="text-2xl">{item.icon}</span>
+                  </div>
+                )}
+              </div>
             </div>
           );
         })}

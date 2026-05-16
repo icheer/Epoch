@@ -24,6 +24,8 @@ export function InputRenderer({
     placeholder,
     inputType = "text",
     required = false,
+    error = "",
+    helperText = "",
   } = component;
 
   if (!id) return null;
@@ -31,6 +33,8 @@ export function InputRenderer({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange?.(id, e.target.value);
   };
+
+  const hasError = error && error.trim() !== "";
 
   return (
     <div className={cn("space-y-2", isInFlexRow && "flex-1 min-w-0")}>
@@ -47,8 +51,17 @@ export function InputRenderer({
         required={required}
         value={value}
         onChange={handleChange}
-        className="border-gray-300 focus:border-pink-500 focus:ring-pink-500"
+        className={cn(
+          "border-gray-300 focus:border-pink-500 focus:ring-pink-500",
+          hasError && "border-red-500 focus:border-red-500 focus:ring-red-500"
+        )}
       />
+      {hasError && (
+        <p className="text-xs text-red-600 mt-1">{error}</p>
+      )}
+      {!hasError && helperText && (
+        <p className="text-xs text-gray-500 mt-1">{helperText}</p>
+      )}
     </div>
   );
 }

@@ -33,7 +33,7 @@ export function TextRenderer({ component }: { component: TextComponent }) {
     style?.italic && "italic",
     style?.underline && "underline underline-offset-2",
     style?.strike && "line-through",
-    style?.code &&
+    style?.code && variant !== "code" &&
       "font-mono bg-gray-100 px-2 py-1 rounded border border-gray-200",
   );
 

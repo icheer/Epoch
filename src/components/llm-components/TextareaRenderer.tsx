@@ -18,13 +18,23 @@ export function TextareaRenderer({
   onChange,
   isInFlexRow = false,
 }: TextareaRendererProps) {
-  const { id, label, placeholder, rows = 4, required = false } = component;
+  const {
+    id,
+    label,
+    placeholder,
+    rows = 4,
+    required = false,
+    error = "",
+    helperText = "",
+  } = component;
 
   if (!id) return null;
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     onChange?.(id, e.target.value);
   };
+
+  const hasError = error && error.trim() !== "";
 
   return (
     <div className={cn("space-y-2", isInFlexRow && "flex-1 min-w-0")}>
@@ -41,8 +51,17 @@ export function TextareaRenderer({
         rows={rows}
         value={value}
         onChange={handleChange}
-        className="border-gray-300 focus:border-pink-500 focus:ring-pink-500 resize-none"
+        className={cn(
+          "border-gray-300 focus:border-pink-500 focus:ring-pink-500 resize-none",
+          hasError && "border-red-500 focus:border-red-500 focus:ring-red-500"
+        )}
       />
+      {hasError && (
+        <p className="text-xs text-red-600 mt-1">{error}</p>
+      )}
+      {!hasError && helperText && (
+        <p className="text-xs text-gray-500 mt-1">{helperText}</p>
+      )}
     </div>
   );
 }

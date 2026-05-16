@@ -58,7 +58,7 @@ export function ChartRenderer({
     if (!yKey.key) return acc;
     acc[yKey.key] = {
       label: yKey.label || yKey.key,
-      color: `var(--chart-${(index % 5) + 1})`,
+      color: yKey.color || `var(--chart-${(index % 5) + 1})`,
     };
     return acc;
   }, {} as ChartConfig);

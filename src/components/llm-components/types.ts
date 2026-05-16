@@ -81,6 +81,8 @@ export interface InputComponent {
   placeholder?: string;
   inputType?: InputType;
   required?: boolean;
+  error?: string;
+  helperText?: string;
 }
 
 export interface TextareaComponent {
@@ -90,6 +92,8 @@ export interface TextareaComponent {
   placeholder?: string;
   rows?: number;
   required?: boolean;
+  error?: string;
+  helperText?: string;
 }
 
 export interface SelectOption {
@@ -104,6 +108,8 @@ export interface SelectComponent {
   placeholder?: string;
   options?: SelectOption[];
   required?: boolean;
+  error?: string;
+  helperText?: string;
 }
 
 export interface ChartYKey {

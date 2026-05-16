@@ -229,7 +229,7 @@ export default function Home() {
   };
 
   return (
-    <main className="bg-background min-h-screen">
+    <main className="bg-background min-h-screen min-h-[100dvh]">
 
       <div
         role="log"
@@ -340,7 +340,7 @@ export default function Home() {
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 max-w-[802px] 2xl:max-w-[930px] mx-auto px-4 md:px-0">
+      <div className="fixed bottom-0 left-0 right-0 max-w-[802px] 2xl:max-w-[930px] mx-auto px-4 md:px-0 z-50">
         <div className="absolute bottom-full left-0 right-0 h-8 bg-gradient-to-t from-background to-transparent pointer-events-none" />
         <div className="bg-background pt-1 pb-6 md:pb-8">
           <div className="flex items-center gap-2 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 pr-2 pl-3 py-2.5">

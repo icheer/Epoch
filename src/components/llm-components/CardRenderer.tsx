@@ -31,6 +31,7 @@ export function CardRenderer({
   const [imageUrl, setImageUrl] = useState<string | null>(image || null);
   const [loading, setLoading] = useState(false);
   const [loadedQuery, setLoadedQuery] = useState<string | null>(null);
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     if (
@@ -45,18 +46,26 @@ export function CardRenderer({
         const fetchImage = async () => {
           try {
             setLoading(true);
+            setImageError(false);
             const res = await fetch("/api/search-image", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ query: imageQuery }),
             });
             const data = await res.json();
-            if (!cancelled && data.imageUrl) {
-              setImageUrl(data.imageUrl);
-              setLoadedQuery(imageQuery);
+            if (!cancelled) {
+              if (data.imageUrl) {
+                setImageUrl(data.imageUrl);
+                setLoadedQuery(imageQuery);
+              } else {
+                setImageError(true);
+              }
             }
           } catch (err) {
             console.error("Failed to fetch image:", err);
+            if (!cancelled) {
+              setImageError(true);
+            }
           } finally {
             if (!cancelled) {
               setLoading(false);
@@ -90,10 +99,19 @@ export function CardRenderer({
       )}
       onClick={handleClick}
     >
-      {(imageUrl || loading) && (
+      {(imageUrl || loading || imageError) && (
         <div className="relative h-48 sm:h-56 w-full overflow-hidden">
           {loading ? (
             <div className="absolute inset-0 animate-pulse bg-gradient-to-br from-gray-100 to-gray-200" />
+          ) : imageError ? (
+            <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+              <div className="text-center px-4">
+                <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <p className="mt-2 text-xs text-gray-500">Image unavailable</p>
+              </div>
+            </div>
           ) : (
             imageUrl && (
               <div className="relative h-full w-full">
@@ -103,15 +121,16 @@ export function CardRenderer({
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                   loading="lazy"
                   referrerPolicy="no-referrer"
+                  onError={() => setImageError(true)}
                 />
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white/20" />
-                <div className="absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-white via-white/90 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white/30" />
+                <div className="absolute inset-x-0 bottom-0 h-full bg-gradient-to-t from-white via-white/95 to-transparent" />
                 <div
-                  className="absolute inset-x-0 bottom-0 h-1/2"
+                  className="absolute inset-x-0 bottom-0 h-3/5"
                   style={{
                     backdropFilter: "blur(1px)",
                     background:
-                      "linear-gradient(to top, rgba(255,255,255,1) 0%, rgba(255,255,255,0.95) 20%, rgba(255,255,255,0.7) 40%, rgba(255,255,255,0) 100%)",
+                      "linear-gradient(to top, rgba(255,255,255,1) 0%, rgba(255,255,255,0.98) 30%, rgba(255,255,255,0.85) 50%, rgba(255,255,255,0) 100%)",
                   }}
                 />
               </div>

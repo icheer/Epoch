@@ -1,5 +1,6 @@
 import { UIComponent } from "./types";
 import { TextRenderer } from "./TextRenderer";
+import { BlockquoteRenderer } from "./BlockquoteRenderer";
 import { FlexRenderer } from "./FlexRenderer";
 import { ImageRenderer } from "./ImageRenderer";
 import { ListRenderer } from "./ListRenderer";
@@ -7,6 +8,7 @@ import { ButtonRenderer } from "./ButtonRenderer";
 import { InputRenderer } from "./InputRenderer";
 import { TextareaRenderer } from "./TextareaRenderer";
 import { SelectRenderer } from "./SelectRenderer";
+import { CheckboxRenderer } from "./CheckboxRenderer";
 import { ChartRenderer } from "./ChartRenderer";
 import { BadgeRenderer } from "./BadgeRenderer";
 import { ProgressRenderer } from "./ProgressRenderer";
@@ -24,6 +26,7 @@ import { ComparisonRenderer } from "./ComparisonRenderer";
 import { GalleryRenderer } from "./GalleryRenderer";
 import { TimelineRenderer } from "./TimelineRenderer";
 import { FeatureRenderer } from "./FeatureRenderer";
+import { TableRenderer } from "./TableRenderer";
 
 interface UIRendererProps {
   component: UIComponent;
@@ -45,6 +48,8 @@ export function UIRenderer({
   switch (component.type) {
     case "text":
       return <TextRenderer component={component} />;
+    case "blockquote":
+      return <BlockquoteRenderer component={component} />;
     case "flex":
       return (
         <FlexRenderer
@@ -90,6 +95,15 @@ export function UIRenderer({
         <SelectRenderer
           component={component}
           value={component.id ? formValues?.[component.id] : undefined}
+          onChange={onFormChange}
+          isInFlexRow={isInFlexRow}
+        />
+      );
+    case "checkbox":
+      return (
+        <CheckboxRenderer
+          component={component}
+          value={component.id ? formValues?.[component.id] === "true" : undefined}
           onChange={onFormChange}
           isInFlexRow={isInFlexRow}
         />
@@ -185,6 +199,8 @@ export function UIRenderer({
           onFormChange={onFormChange}
         />
       );
+    case "table":
+      return <TableRenderer component={component} />;
     default:
       return null;
   }

@@ -41,6 +41,12 @@ export interface TextComponent {
   style?: TextStyle;
 }
 
+export interface BlockquoteComponent {
+  type: "blockquote";
+  text?: string;
+  author?: string;
+}
+
 export interface FlexComponent {
   type: "flex";
   direction?: "row" | "column";
@@ -107,6 +113,16 @@ export interface SelectComponent {
   label?: string;
   placeholder?: string;
   options?: SelectOption[];
+  required?: boolean;
+  error?: string;
+  helperText?: string;
+}
+
+export interface CheckboxComponent {
+  type: "checkbox";
+  id?: string;
+  label?: string;
+  checked?: boolean;
   required?: boolean;
   error?: string;
   helperText?: string;
@@ -289,8 +305,22 @@ export interface FeatureComponent {
   variant?: "default" | "primary" | "dark";
 }
 
+export interface TableColumn {
+  key: string;
+  label: string;
+  align?: "left" | "center" | "right";
+}
+
+export interface TableComponent {
+  type: "table";
+  columns: TableColumn[];
+  data?: Record<string, string | number>[];
+  variant?: "default" | "striped";
+}
+
 export type UIComponent =
   | TextComponent
+  | BlockquoteComponent
   | FlexComponent
   | ImageComponent
   | ListComponent
@@ -298,6 +328,7 @@ export type UIComponent =
   | InputComponent
   | TextareaComponent
   | SelectComponent
+  | CheckboxComponent
   | ChartComponent
   | BadgeComponent
   | ProgressComponent
@@ -314,7 +345,8 @@ export type UIComponent =
   | ComparisonComponent
   | GalleryComponent
   | TimelineComponent
-  | FeatureComponent;
+  | FeatureComponent
+  | TableComponent;
 
 export interface ResponseRoot {
   version: number;

@@ -3,6 +3,7 @@
 import { GalleryComponent } from "./types";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
+import { imageCache } from "@/lib/imageCache";
 
 interface GalleryRendererProps {
   component: GalleryComponent;
@@ -28,41 +29,36 @@ export function GalleryRenderer({ component, onAction }: GalleryRendererProps) {
         img.imageQuery !== loadedQueries[index] &&
         !loading[index]
       ) {
-        const debounceTimer = setTimeout(() => {
+        const debounceTimer = setTimeout(async () => {
           setLoading((prev) => {
             const updated = [...prev];
             updated[index] = true;
             return updated;
           });
 
-          fetch("/api/search-image", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ query: img.imageQuery }),
-          })
-            .then((res) => res.json())
-            .then((data) => {
-              if (data.imageUrl) {
-                setLoadedImages((prev) => {
-                  const updated = [...prev];
-                  updated[index] = data.imageUrl;
-                  return updated;
-                });
-                setLoadedQueries((prev) => {
-                  const updated = [...prev];
-                  updated[index] = img.imageQuery!;
-                  return updated;
-                });
-              }
-            })
-            .catch((err) => console.error("Failed to fetch image:", err))
-            .finally(() => {
-              setLoading((prev) => {
+          try {
+            const url = await imageCache.getImage(img.imageQuery!);
+            if (url) {
+              setLoadedImages((prev) => {
                 const updated = [...prev];
-                updated[index] = false;
+                updated[index] = url;
                 return updated;
               });
+              setLoadedQueries((prev) => {
+                const updated = [...prev];
+                updated[index] = img.imageQuery!;
+                return updated;
+              });
+            }
+          } catch (err) {
+            console.error("Failed to fetch image:", err);
+          } finally {
+            setLoading((prev) => {
+              const updated = [...prev];
+              updated[index] = false;
+              return updated;
             });
+          }
         }, 700);
 
         debounceTimers.push(debounceTimer);

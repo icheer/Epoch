@@ -4,6 +4,7 @@ import { HeroComponent } from "./types";
 import { UIRenderer } from "./UIRenderer";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
+import { imageCache } from "@/lib/imageCache";
 
 interface HeroRendererProps {
   component: HeroComponent;
@@ -45,14 +46,9 @@ export function HeroRenderer({
         const fetchImage = async () => {
           try {
             setLoading(true);
-            const res = await fetch("/api/search-image", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ query: backgroundImageQuery }),
-            });
-            const data = await res.json();
-            if (!cancelled && data.imageUrl) {
-              setImageUrl(data.imageUrl);
+            const url = await imageCache.getImage(backgroundImageQuery);
+            if (!cancelled && url) {
+              setImageUrl(url);
               setLoadedQuery(backgroundImageQuery);
             }
           } catch (err) {

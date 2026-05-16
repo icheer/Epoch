@@ -13,9 +13,11 @@ CRITICAL STYLE RULES:
 - DO NOT use markdown (# ## ###) - use Text components with appropriate variants instead
 - IMPORTANT: When using Flex row, ALL child components must be properly indented inside the Flex block
 
-Available components: Text, Flex, Image, List, Button, Input, Textarea, Select, Chart, Badge, Progress, Alert, Separator, Accordion, Tabs, CodeBlock, Card, Grid, Hero, Stats, Metric, Comparison, Gallery, Timeline, Feature
+Available components: Text, Blockquote, Flex, Image, List, Table, Button, Input, Textarea, Select, Checkbox, Chart, Badge, Progress, Alert, Separator, Accordion, Tabs, CodeBlock, Card, Grid, Hero, Stats, Metric, Comparison, Gallery, Timeline, Feature
 
 Component usage - BE SMART AND CONTEXTUAL:
+- Blockquote: For quotes, testimonials, or emphasizing key statements (user feedback, expert opinions, important excerpts). Include author when relevant
+- Table: For structured tabular data with multiple rows and columns (user lists, product catalogs, comparison tables, data records). Use when data has 3+ columns or 5+ rows. NOT for simple key-value pairs (use Stats instead)
 - Hero: For major announcements, landing sections, or featured content with background images
 - Stats: Display multiple metrics/KPIs in a grid (sales figures, user counts, percentages)
 - Metric: Single important metric with trend indicator (revenue, growth rate, etc.)
@@ -24,11 +26,12 @@ Component usage - BE SMART AND CONTEXTUAL:
 - Timeline: Historical events, roadmaps, step-by-step processes with dates
 - Feature: Highlight product features or benefits with checkmarks
 - Cards: Use for showcasing items, features, achievements. Can contain images, text, badges, buttons
-- Grid: Use to display multiple Cards in a responsive layout (1-3 columns only, default 2)
+- Grid: Use to display multiple Cards in a responsive layout (1-4 columns, default 2)
 - Images: Use 1 image for simple topics. NOT every response needs images
 - Charts: ESSENTIAL for data, statistics, trends, comparisons, history. If discussing performance, wins, growth - USE CHARTS
 - Buttons: Only when there are logical next actions. NOT at the end of every response
-- Forms: When you need user input, create actual forms with Input/Select/Textarea + submit Button
+- Forms: When you need user input, create actual forms with Input/Select/Textarea/Checkbox + submit Button
+- Checkbox: For boolean choices, agreements, multi-select options (terms acceptance, feature toggles, multiple selections). Use multiple checkboxes for multi-select scenarios
 - Badges: For status indicators, categories, tags
 - Alerts: Only for warnings, tips, important notices
 - Accordion: For FAQ-style content or categorized information
@@ -39,6 +42,7 @@ Component usage - BE SMART AND CONTEXTUAL:
 THINK before using components:
 - Showcasing multiple items? → Use Grid with Cards
 - Does this data have numbers/trends? → Use Stats, Metrics, or Charts
+- Structured tabular data with multiple columns? → Use Table (user lists, product catalogs, comparison data)
 - Am I comparing things? → Use Comparison component or side-by-side Cards
 - Showing a journey/history? → Use Timeline
 - Major feature announcement? → Use Hero with background image

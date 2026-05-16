@@ -4,6 +4,7 @@ import { CardComponent } from "./types";
 import { UIRenderer } from "./UIRenderer";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
+import { imageCache } from "@/lib/imageCache";
 
 interface CardRendererProps {
   component: CardComponent;
@@ -47,15 +48,10 @@ export function CardRenderer({
           try {
             setLoading(true);
             setImageError(false);
-            const res = await fetch("/api/search-image", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ query: imageQuery }),
-            });
-            const data = await res.json();
+            const url = await imageCache.getImage(imageQuery);
             if (!cancelled) {
-              if (data.imageUrl) {
-                setImageUrl(data.imageUrl);
+              if (url) {
+                setImageUrl(url);
                 setLoadedQuery(imageQuery);
               } else {
                 setImageError(true);

@@ -35,6 +35,14 @@ const ResponseComponent = (() => {
 
       z
         .object({
+          type: z.literal("blockquote"),
+          text: z.string().min(1),
+          author: z.string().default(""),
+        })
+        .strict(),
+
+      z
+        .object({
           type: z.literal("flex"),
           direction: z.enum(["row", "column"]),
           align: z
@@ -126,6 +134,18 @@ const ResponseComponent = (() => {
               }),
             )
             .min(1),
+          required: z.boolean().default(false),
+          error: z.string().default(""),
+          helperText: z.string().default(""),
+        })
+        .strict(),
+
+      z
+        .object({
+          type: z.literal("checkbox"),
+          id: z.string().min(1),
+          label: z.string().default(""),
+          checked: z.boolean().default(false),
           required: z.boolean().default(false),
           error: z.string().default(""),
           helperText: z.string().default(""),
@@ -369,6 +389,26 @@ const ResponseComponent = (() => {
             .max(10)
             .default([]),
           variant: z.enum(["default", "primary", "dark"]).default("default"),
+        })
+        .strict(),
+
+      z
+        .object({
+          type: z.literal("table"),
+          columns: z
+            .array(
+              z.object({
+                key: z.string(),
+                label: z.string(),
+                align: z.enum(["left", "center", "right"]).default("left"),
+              }),
+            )
+            .min(1),
+          data: z
+            .array(z.record(z.string(), z.union([z.string(), z.number()])))
+            .max(50)
+            .default([]),
+          variant: z.enum(["default", "striped"]).default("default"),
         })
         .strict(),
     ]),

@@ -5,23 +5,7 @@ import Image from "next/image";
 import { ImageComponent } from "./types";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
-
-const searchImage = async (query: string): Promise<string> => {
-  const res = await fetch("/api/search-image", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ query }),
-  });
-
-  if (!res.ok) {
-    throw new Error("Image search failed");
-  }
-
-  const data = await res.json();
-  return data.imageUrl;
-};
+import { imageCache } from "@/lib/imageCache";
 
 interface ImageRendererProps {
   component: ImageComponent;
@@ -52,10 +36,13 @@ export function ImageRenderer({
         const loadImage = async () => {
           try {
             setLoading(true);
-            const url = await searchImage(searchQuery);
-            if (!cancelled) {
+            const url = await imageCache.getImage(searchQuery);
+            if (!cancelled && url) {
               setImageSrc(url);
               setLoadedQuery(searchQuery);
+              setLoading(false);
+            } else if (!cancelled) {
+              setError(true);
               setLoading(false);
             }
           } catch (err) {

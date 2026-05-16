@@ -1,17 +1,48 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowUp, Square } from "lucide-react";
 import { UIRenderer, ResponseRoot } from "@/components/llm-components";
 
-const EXAMPLE_PROMPTS = [
-  "展示全球主要城市的天气比较",
-  "创建一个待办事项管理界面",
+const ALL_EXAMPLE_PROMPTS = [
+  "比较北京、上海、深圳的房价走势",
   "用图表分析 AI 行业发展趋势",
-  "设计一个产品功能对比页面",
+  "分析特斯拉最近一年的股价变化",
+  "推荐几个适合周末游玩的城市",
+  "用时间线展示互联网发展历史",
+  "展示日本最值得去的旅游景点",
+  "分析不同编程语言的流行度趋势",
+  "推荐适合新手的健身训练计划",
+  "展示世界著名建筑的卡片集合",
+  "用图表对比不同手机品牌的市场份额",
+  "介绍世界上最高的十座建筑",
+  "展示奥运会金牌榜前十名国家",
+  "推荐几部高分科幻电影",
+  "比较iPhone和华为手机的参数配置",
+  "分析气候变化的数据可视化",
+  "展示2024年全球票房前十的电影",
+  "帮我计算房贷月供和总利息",
+  "展示太阳系八大行星的信息卡片",
+  "用图表分析全球咖啡消费量分布",
+  "展示世界新七大奇迹的图片画廊",
+  "比较不同城市的生活成本",
+  "展示最受欢迎的编程语言排行榜",
+  "用时间线展示苹果公司产品发布历史",
+  "分析中国历史朝代更替时间线",
+  "推荐健康饮食食谱",
+  "展示NBA球队排名",
+  "对比主流云服务商",
+  "分析全球气温变化",
+  "推荐编程学习路线",
+  "展示中国名山大川",
 ];
+
+function getRandomPrompts(count: number): string[] {
+  const shuffled = [...ALL_EXAMPLE_PROMPTS].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, count);
+}
 
 interface Message {
   role: "user" | "assistant";
@@ -27,11 +58,13 @@ interface RetryState {
 }
 
 export default function Home() {
+  const examplePrompts = useMemo(() => getRandomPrompts(4), []);
+
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
       content:
-        "你好，我是 Epoch。每次对话都会生成可交互的组件界面——按钮、表单、图表、图库，而不只是文字回复。试试下面的例子，或者直接输入你想探索的内容。",
+        "你好！我会把回答转化为可交互的界面——图表、卡片、表单、画廊，而不只是文字。试试下面的例子，或直接说出你的想法。",
     },
   ]);
   const [input, setInput] = useState("");
@@ -229,13 +262,13 @@ export default function Home() {
   };
 
   return (
-    <main className="bg-background min-h-screen min-h-[100dvh]">
+    <main className="bg-background h-[100dvh] overflow-hidden flex flex-col">
 
       <div
         role="log"
         aria-live="polite"
         aria-label="对话历史"
-        className="max-w-3xl 2xl:max-w-4xl mx-auto flex flex-col space-y-6 md:space-y-10 pt-6 md:pt-10 pb-32 md:pb-40 px-4 md:px-0"
+        className="flex-1 overflow-y-auto max-w-3xl 2xl:max-w-4xl mx-auto w-full flex flex-col space-y-6 md:space-y-10 pt-6 md:pt-10 pb-32 md:pb-40 px-4 md:px-0"
       >
         {messages.map((message, index) => (
           <div key={index}>
@@ -298,7 +331,7 @@ export default function Home() {
             {/* Example prompts — only shown after the initial greeting */}
             {index === 0 && messages.length === 1 && (
               <div className="flex flex-wrap gap-2 mt-4">
-                {EXAMPLE_PROMPTS.map((prompt) => (
+                {examplePrompts.map((prompt) => (
                   <button
                     key={prompt}
                     onClick={() => handleExamplePrompt(prompt)}

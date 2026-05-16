@@ -29,7 +29,7 @@ export function CheckboxRenderer({
 
   if (!id) return null;
 
-  const isChecked = value !== undefined ? value === "true" : checked;
+  const isChecked = value !== undefined ? value : checked;
 
   const handleChange = (newChecked: boolean) => {
     onChange?.(id, String(newChecked));

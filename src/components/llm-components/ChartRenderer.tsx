@@ -88,7 +88,11 @@ export function ChartRenderer({
             config={chartConfig}
             className="min-h-[300px] w-full max-w-full shadow-none border-gray-200"
           >
-            <BarChart accessibilityLayer data={data}>
+            <BarChart
+              accessibilityLayer
+              data={data}
+              margin={{ top: 5, right: 5, bottom: shouldRotateLabels ? 60 : 5, left: 5 }}
+            >
               <defs>
                 {gradients.map((gradient, index) => (
                   <linearGradient
@@ -144,7 +148,11 @@ export function ChartRenderer({
 
         return (
           <ChartContainer config={chartConfig} className="min-h-[300px] w-full max-w-full">
-            <LineChart accessibilityLayer data={data}>
+            <LineChart
+              accessibilityLayer
+              data={data}
+              margin={{ top: 5, right: 5, bottom: shouldRotateLabelsLine ? 60 : 5, left: 5 }}
+            >
               <defs>
                 {gradients.map((gradient, index) => (
                   <linearGradient
@@ -195,7 +203,11 @@ export function ChartRenderer({
 
         return (
           <ChartContainer config={chartConfig} className="min-h-[300px] w-full max-w-full">
-            <AreaChart accessibilityLayer data={data}>
+            <AreaChart
+              accessibilityLayer
+              data={data}
+              margin={{ top: 5, right: 5, bottom: shouldRotateLabelsArea ? 60 : 5, left: 5 }}
+            >
               <defs>
                 {gradients.map((gradient, index) => (
                   <linearGradient

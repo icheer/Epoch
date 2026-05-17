@@ -89,26 +89,21 @@ export default function Home() {
   const abortControllerRef = useRef<AbortController | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const isNearBottomRef = useRef(true);
-  const userScrolledAwayRef = useRef(false);
+  const lastUserScrollTime = useRef(0);
 
   // Track whether user has scrolled away from the bottom
   useEffect(() => {
     const onScroll = () => {
+      lastUserScrollTime.current = Date.now();
       const distanceToBottom =
         document.documentElement.scrollHeight -
         window.scrollY -
         window.innerHeight;
-      const wasNearBottom = isNearBottomRef.current;
       isNearBottomRef.current = distanceToBottom < 200;
-
-      // If user scrolled away from bottom during streaming, mark it
-      if (isStreaming && wasNearBottom && !isNearBottomRef.current) {
-        userScrolledAwayRef.current = true;
-      }
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, [isStreaming]);
+  }, []);
 
   const scrollToBottom = useCallback((force = false) => {
     if (force || isNearBottomRef.current) {
@@ -121,19 +116,16 @@ export default function Home() {
     scrollToBottom(true);
   }, [messages, scrollToBottom]);
 
-  // During streaming, only scroll if user is already near the bottom
+  // During streaming, only scroll if user hasn't scrolled recently
   useEffect(() => {
-    if (currentStreamingResponse && !userScrolledAwayRef.current) {
-      scrollToBottom(false);
+    if (currentStreamingResponse) {
+      const timeSinceLastScroll = Date.now() - lastUserScrollTime.current;
+      // Only auto-scroll if user hasn't scrolled in the last 1.5 seconds
+      if (timeSinceLastScroll > 1500 && isNearBottomRef.current) {
+        scrollToBottom(false);
+      }
     }
   }, [currentStreamingResponse, scrollToBottom]);
-
-  // Reset scroll-away flag when streaming ends
-  useEffect(() => {
-    if (!isStreaming) {
-      userScrolledAwayRef.current = false;
-    }
-  }, [isStreaming]);
 
   const streamResponse = async (userMessage: string, apiBase?: Message[]) => {
     setIsStreaming(true);

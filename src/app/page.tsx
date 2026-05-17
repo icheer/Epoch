@@ -90,6 +90,7 @@ export default function Home() {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const isNearBottomRef = useRef(true);
   const lastUserScrollTime = useRef(0);
+  const lastAutoScrollTime = useRef(0);
 
   // Track whether user has scrolled away from the bottom
   useEffect(() => {
@@ -116,12 +117,19 @@ export default function Home() {
     scrollToBottom(true);
   }, [messages, scrollToBottom]);
 
-  // During streaming, only scroll if user hasn't scrolled recently
+  // During streaming, only scroll if user hasn't scrolled recently (throttled)
   useEffect(() => {
     if (currentStreamingResponse) {
-      const timeSinceLastScroll = Date.now() - lastUserScrollTime.current;
-      // Only auto-scroll if user hasn't scrolled in the last 1.5 seconds
-      if (timeSinceLastScroll > 1500 && isNearBottomRef.current) {
+      const now = Date.now();
+      const timeSinceLastScroll = now - lastUserScrollTime.current;
+      const timeSinceLastAutoScroll = now - lastAutoScrollTime.current;
+
+      // Only auto-scroll if:
+      // 1. User hasn't scrolled in 2 seconds
+      // 2. We haven't auto-scrolled in the last 500ms (throttle)
+      // 3. User is near bottom
+      if (timeSinceLastScroll > 2000 && timeSinceLastAutoScroll > 500 && isNearBottomRef.current) {
+        lastAutoScrollTime.current = now;
         scrollToBottom(false);
       }
     }

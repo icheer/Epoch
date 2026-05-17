@@ -5,6 +5,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowUp, Square } from "lucide-react";
 import { UIRenderer, ResponseRoot } from "@/components/llm-components";
+import { Sidebar } from "@/components/Sidebar";
+import { conversationStorage, Conversation } from "@/lib/conversationStorage";
 
 const ALL_EXAMPLE_PROMPTS = [
   "比较北京、上海、深圳的房价走势",
@@ -60,6 +62,7 @@ interface RetryState {
 export default function Home() {
   const examplePrompts = useMemo(() => getRandomPrompts(4), []);
 
+  const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
@@ -205,6 +208,71 @@ export default function Home() {
     }
   };
 
+  // Auto-save conversation
+  useEffect(() => {
+    if (messages.length > 1) {
+      const firstUserMessage = messages.find((m) => m.role === "user");
+      const title = firstUserMessage
+        ? typeof firstUserMessage.content === "string"
+          ? firstUserMessage.content
+          : "新对话"
+        : "新对话";
+
+      const id = currentConversationId || Date.now().toString();
+      if (!currentConversationId) {
+        setCurrentConversationId(id);
+      }
+
+      const conversation: Conversation = {
+        id,
+        title,
+        messages: messages.map((m) => ({
+          role: m.role,
+          content: typeof m.content === "string" ? m.content : m.content,
+          isAction: m.isAction,
+          actionLabel: m.actionLabel,
+          isError: m.isError,
+        })),
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      };
+
+      conversationStorage.save(conversation);
+    }
+  }, [messages, currentConversationId]);
+
+  const handleNewConversation = () => {
+    setCurrentConversationId(null);
+    setMessages([
+      {
+        role: "assistant",
+        content:
+          "你好！我会把回答转化为可交互的界面——图表、卡片、表单、画廊，而不只是文字。试试下面的例子，或直接说出你的想法。",
+      },
+    ]);
+    setInput("");
+    setFormValues({});
+    setRetryState(null);
+  };
+
+  const handleSelectConversation = (id: string) => {
+    const conversation = conversationStorage.getById(id);
+    if (conversation) {
+      setCurrentConversationId(id);
+      setMessages(conversation.messages as Message[]);
+      setInput("");
+      setFormValues({});
+      setRetryState(null);
+    }
+  };
+
+  const handleDeleteConversation = (id: string) => {
+    conversationStorage.delete(id);
+    if (currentConversationId === id) {
+      handleNewConversation();
+    }
+  };
+
   const handleSend = async () => {
     if (!input.trim() || isStreaming) return;
     const userMessage = input.trim();
@@ -262,14 +330,21 @@ export default function Home() {
   };
 
   return (
-    <main className="bg-background h-[100dvh] overflow-hidden flex flex-col">
+    <main className="bg-background h-[100dvh] overflow-hidden flex">
+      <Sidebar
+        currentConversationId={currentConversationId}
+        onNewConversation={handleNewConversation}
+        onSelectConversation={handleSelectConversation}
+        onDeleteConversation={handleDeleteConversation}
+      />
 
-      <div
-        role="log"
-        aria-live="polite"
-        aria-label="对话历史"
-        className="flex-1 overflow-y-auto max-w-3xl 2xl:max-w-4xl mx-auto w-full flex flex-col space-y-6 md:space-y-10 pt-6 md:pt-10 pb-32 md:pb-40 px-4 md:px-0"
-      >
+      <div className="flex-1 flex flex-col md:ml-64">
+        <div
+          role="log"
+          aria-live="polite"
+          aria-label="对话历史"
+          className="flex-1 overflow-y-auto max-w-3xl 2xl:max-w-4xl mx-auto w-full flex flex-col space-y-6 md:space-y-10 pt-6 md:pt-10 pb-32 md:pb-40 px-4 md:px-0"
+        >
         {messages.map((message, index) => (
           <div key={index}>
             {message.role === "user" ? (
@@ -373,7 +448,7 @@ export default function Home() {
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 max-w-[802px] 2xl:max-w-[930px] mx-auto px-4 md:px-0 z-50">
+      <div className="fixed bottom-0 left-0 right-0 md:left-64 max-w-[802px] 2xl:max-w-[930px] mx-auto px-4 md:px-0 z-50">
         <div className="absolute bottom-full left-0 right-0 h-8 bg-gradient-to-t from-background to-transparent pointer-events-none" />
         <div className="bg-background pt-1 pb-6 md:pb-8">
           <div className="flex items-center gap-2 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 pr-2 pl-3 py-2.5">

@@ -274,7 +274,7 @@ export function ChartRenderer({
 
   return (
     <Card
-      className={cn("shadow-sm", isInFlexRow ? "flex-1 min-w-0" : "w-full")}
+      className={cn("shadow-sm overflow-hidden", isInFlexRow ? "flex-1 min-w-0" : "w-full max-w-full")}
     >
       {(title || description) && (
         <CardHeader>
@@ -286,7 +286,7 @@ export function ChartRenderer({
           )}
         </CardHeader>
       )}
-      <CardContent>{renderChart()}</CardContent>
+      <CardContent className="overflow-x-auto">{renderChart()}</CardContent>
     </Card>
   );
 }

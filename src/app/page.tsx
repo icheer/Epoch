@@ -89,6 +89,7 @@ export default function Home() {
   const abortControllerRef = useRef<AbortController | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const isNearBottomRef = useRef(true);
+  const userScrolledAwayRef = useRef(false);
 
   // Track whether user has scrolled away from the bottom
   useEffect(() => {
@@ -97,11 +98,17 @@ export default function Home() {
         document.documentElement.scrollHeight -
         window.scrollY -
         window.innerHeight;
+      const wasNearBottom = isNearBottomRef.current;
       isNearBottomRef.current = distanceToBottom < 200;
+
+      // If user scrolled away from bottom during streaming, mark it
+      if (isStreaming && wasNearBottom && !isNearBottomRef.current) {
+        userScrolledAwayRef.current = true;
+      }
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [isStreaming]);
 
   const scrollToBottom = useCallback((force = false) => {
     if (force || isNearBottomRef.current) {
@@ -116,10 +123,17 @@ export default function Home() {
 
   // During streaming, only scroll if user is already near the bottom
   useEffect(() => {
-    if (currentStreamingResponse) {
+    if (currentStreamingResponse && !userScrolledAwayRef.current) {
       scrollToBottom(false);
     }
   }, [currentStreamingResponse, scrollToBottom]);
+
+  // Reset scroll-away flag when streaming ends
+  useEffect(() => {
+    if (!isStreaming) {
+      userScrolledAwayRef.current = false;
+    }
+  }, [isStreaming]);
 
   const streamResponse = async (userMessage: string, apiBase?: Message[]) => {
     setIsStreaming(true);

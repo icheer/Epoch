@@ -74,6 +74,9 @@ export function ChartRenderer({
   const renderChart = () => {
     switch (chartType) {
       case "bar":
+        // If single yKey, color each bar differently; if multiple yKeys, color each series differently
+        const isSingleSeries = yKeys.length === 1;
+
         return (
           <ChartContainer
             config={chartConfig}
@@ -116,9 +119,13 @@ export function ChartRenderer({
                 <Bar
                   key={yKey.key}
                   dataKey={yKey.key!}
-                  fill={`url(#${gradients[index % gradients.length].id})`}
+                  fill={isSingleSeries ? undefined : `url(#${gradients[index % gradients.length].id})`}
                   radius={[4, 4, 0, 0]}
-                />
+                >
+                  {isSingleSeries && data.map((entry, dataIndex) => (
+                    <Cell key={`cell-${dataIndex}`} fill={`url(#${gradients[dataIndex % gradients.length].id})`} />
+                  ))}
+                </Bar>
               ))}
             </BarChart>
           </ChartContainer>
@@ -261,7 +268,7 @@ export function ChartRenderer({
                 cx="50%"
                 cy="50%"
                 outerRadius={100}
-                label
+                label={({ name, value }) => `${name}: ${value}`}
               />
             </PieChart>
           </ChartContainer>

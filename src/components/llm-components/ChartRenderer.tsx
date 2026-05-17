@@ -69,6 +69,11 @@ export function ChartRenderer({
     { id: "gradient3", from: "#8b5cf6", to: "#d946ef" },
     { id: "gradient4", from: "#0ea5e9", to: "#3b82f6" },
     { id: "gradient5", from: "#f59e0b", to: "#eab308" },
+    { id: "gradient6", from: "#10b981", to: "#22c55e" },
+    { id: "gradient7", from: "#ef4444", to: "#f87171" },
+    { id: "gradient8", from: "#06b6d4", to: "#22d3ee" },
+    { id: "gradient9", from: "#f97316", to: "#fb923c" },
+    { id: "gradient10", from: "#6366f1", to: "#818cf8" },
   ];
 
   const renderChart = () => {
@@ -293,7 +298,7 @@ export function ChartRenderer({
           )}
         </CardHeader>
       )}
-      <CardContent className="overflow-x-auto p-2 md:p-6">{renderChart()}</CardContent>
+      <CardContent className="overflow-x-auto px-0 py-2 md:p-6">{renderChart()}</CardContent>
     </Card>
   );
 }

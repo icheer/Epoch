@@ -81,6 +81,7 @@ export function ChartRenderer({
       case "bar":
         // If single yKey, color each bar differently; if multiple yKeys, color each series differently
         const isSingleSeries = yKeys.length === 1;
+        const shouldRotateLabels = data.length >= 6;
 
         return (
           <ChartContainer
@@ -117,6 +118,8 @@ export function ChartRenderer({
                 tickLine={false}
                 tickMargin={10}
                 axisLine={false}
+                angle={shouldRotateLabels ? -30 : 0}
+                textAnchor={shouldRotateLabels ? "end" : "middle"}
               />
               <YAxis tickLine={false} tickMargin={10} axisLine={false} />
               <ChartTooltip content={<ChartTooltipContent />} />

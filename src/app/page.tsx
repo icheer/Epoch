@@ -343,10 +343,10 @@ export default function Home() {
           role="log"
           aria-live="polite"
           aria-label="对话历史"
-          className="flex-1 overflow-y-auto max-w-3xl 2xl:max-w-4xl mx-auto w-full flex flex-col space-y-6 md:space-y-10 pt-6 md:pt-10 pb-32 md:pb-40 px-4 md:px-0"
+          className="flex-1 overflow-y-auto overflow-x-hidden max-w-3xl 2xl:max-w-4xl mx-auto w-full flex flex-col space-y-6 md:space-y-10 pt-6 md:pt-10 pb-32 md:pb-40 px-4 md:px-0"
         >
         {messages.map((message, index) => (
-          <div key={index}>
+          <div key={index} className="min-w-0 max-w-full">
             {message.role === "user" ? (
               message.isAction ? (
                 <div className="flex items-center gap-1.5">

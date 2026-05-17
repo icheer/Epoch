@@ -27,8 +27,10 @@ export function Sidebar({
 
   const handleDelete = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
-    onDeleteConversation(id);
-    setConversations(conversationStorage.getAll());
+    if (window.confirm("确定要删除这条对话吗？")) {
+      onDeleteConversation(id);
+      setConversations(conversationStorage.getAll());
+    }
   };
 
   return (
@@ -36,7 +38,7 @@ export function Sidebar({
       {/* Mobile menu button */}
       <button
         onClick={() => setIsOpen(true)}
-        className="md:hidden fixed top-4 left-4 z-40 p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+        className="md:hidden fixed top-4 left-4 z-[60] p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
         aria-label="打开菜单"
       >
         <Menu size={20} />
@@ -45,7 +47,7 @@ export function Sidebar({
       {/* Overlay for mobile */}
       {isOpen && (
         <div
-          className="md:hidden fixed inset-0 bg-black/50 z-40"
+          className="md:hidden fixed inset-0 bg-black/50 z-[60]"
           onClick={() => setIsOpen(false)}
         />
       )}
@@ -53,7 +55,7 @@ export function Sidebar({
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed top-0 left-0 h-full w-64 bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 z-50 flex flex-col transition-transform duration-300",
+          "fixed top-0 left-0 h-full w-64 bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 z-[70] flex flex-col transition-transform duration-300",
           "md:translate-x-0",
           isOpen ? "translate-x-0" : "-translate-x-full"
         )}
@@ -111,7 +113,7 @@ export function Sidebar({
                   <span className="flex-1 truncate">{conv.title}</span>
                   <button
                     onClick={(e) => handleDelete(e, conv.id)}
-                    className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-gray-300 dark:hover:bg-gray-700 transition-opacity"
+                    className="p-1 rounded hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors"
                     aria-label="删除对话"
                   >
                     <Trash2 size={14} />

@@ -140,6 +140,8 @@ export function ChartRenderer({
         );
 
       case "line":
+        const shouldRotateLabelsLine = data.length >= 6;
+
         return (
           <ChartContainer config={chartConfig} className="min-h-[300px] w-full max-w-full">
             <LineChart accessibilityLayer data={data}>
@@ -164,6 +166,8 @@ export function ChartRenderer({
                 tickLine={false}
                 tickMargin={10}
                 axisLine={false}
+                angle={shouldRotateLabelsLine ? -30 : 0}
+                textAnchor={shouldRotateLabelsLine ? "end" : "middle"}
               />
               <YAxis tickLine={false} tickMargin={10} axisLine={false} />
               <ChartTooltip content={<ChartTooltipContent />} />
@@ -187,6 +191,8 @@ export function ChartRenderer({
         );
 
       case "area":
+        const shouldRotateLabelsArea = data.length >= 6;
+
         return (
           <ChartContainer config={chartConfig} className="min-h-[300px] w-full max-w-full">
             <AreaChart accessibilityLayer data={data}>
@@ -219,6 +225,8 @@ export function ChartRenderer({
                 tickLine={false}
                 tickMargin={10}
                 axisLine={false}
+                angle={shouldRotateLabelsArea ? -30 : 0}
+                textAnchor={shouldRotateLabelsArea ? "end" : "middle"}
               />
               <YAxis tickLine={false} tickMargin={10} axisLine={false} />
               <ChartTooltip content={<ChartTooltipContent />} />

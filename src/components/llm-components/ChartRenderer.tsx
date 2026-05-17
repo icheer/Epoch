@@ -293,7 +293,7 @@ export function ChartRenderer({
           )}
         </CardHeader>
       )}
-      <CardContent className="overflow-x-auto">{renderChart()}</CardContent>
+      <CardContent className="overflow-x-auto p-2 md:p-6">{renderChart()}</CardContent>
     </Card>
   );
 }

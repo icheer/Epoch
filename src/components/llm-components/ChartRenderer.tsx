@@ -80,7 +80,7 @@ export function ChartRenderer({
         return (
           <ChartContainer
             config={chartConfig}
-            className="min-h-[300px] w-full shadow-none border-gray-200"
+            className="min-h-[300px] w-full max-w-full shadow-none border-gray-200"
           >
             <BarChart accessibilityLayer data={data}>
               <defs>
@@ -133,7 +133,7 @@ export function ChartRenderer({
 
       case "line":
         return (
-          <ChartContainer config={chartConfig} className="min-h-[300px] w-full">
+          <ChartContainer config={chartConfig} className="min-h-[300px] w-full max-w-full">
             <LineChart accessibilityLayer data={data}>
               <defs>
                 {gradients.map((gradient, index) => (
@@ -180,7 +180,7 @@ export function ChartRenderer({
 
       case "area":
         return (
-          <ChartContainer config={chartConfig} className="min-h-[300px] w-full">
+          <ChartContainer config={chartConfig} className="min-h-[300px] w-full max-w-full">
             <AreaChart accessibilityLayer data={data}>
               <defs>
                 {gradients.map((gradient, index) => (
@@ -240,7 +240,7 @@ export function ChartRenderer({
         }));
 
         return (
-          <ChartContainer config={chartConfig} className="min-h-[300px] w-full">
+          <ChartContainer config={chartConfig} className="min-h-[300px] w-full max-w-full">
             <PieChart>
               <defs>
                 {pieData.map((_, index) => {

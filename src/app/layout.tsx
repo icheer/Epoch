@@ -20,6 +20,12 @@ export const metadata: Metadata = {
     initialScale: 1,
     maximumScale: 1,
   },
+  themeColor: "#000000",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Epoch",
+  },
 };
 
 export default function RootLayout({

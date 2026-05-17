@@ -89,18 +89,16 @@ export default function Home() {
   const abortControllerRef = useRef<AbortController | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const isNearBottomRef = useRef(true);
-  const lastUserScrollTime = useRef(0);
   const lastAutoScrollTime = useRef(0);
 
   // Track whether user has scrolled away from the bottom
   useEffect(() => {
     const onScroll = () => {
-      lastUserScrollTime.current = Date.now();
       const distanceToBottom =
         document.documentElement.scrollHeight -
         window.scrollY -
         window.innerHeight;
-      isNearBottomRef.current = distanceToBottom < 200;
+      isNearBottomRef.current = distanceToBottom < 100;
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -117,23 +115,19 @@ export default function Home() {
     scrollToBottom(true);
   }, [messages, scrollToBottom]);
 
-  // During streaming, only scroll if user hasn't scrolled recently (throttled)
+  // During streaming, only auto-scroll if user is near bottom (throttled)
   useEffect(() => {
-    if (currentStreamingResponse) {
+    if (currentStreamingResponse && isNearBottomRef.current) {
       const now = Date.now();
-      const timeSinceLastScroll = now - lastUserScrollTime.current;
       const timeSinceLastAutoScroll = now - lastAutoScrollTime.current;
 
-      // Only auto-scroll if:
-      // 1. User hasn't scrolled in 2 seconds
-      // 2. We haven't auto-scrolled in the last 500ms (throttle)
-      // 3. User is near bottom
-      if (timeSinceLastScroll > 2000 && timeSinceLastAutoScroll > 500 && isNearBottomRef.current) {
+      // Throttle: only auto-scroll once every 300ms to prevent jitter
+      if (timeSinceLastAutoScroll > 300) {
         lastAutoScrollTime.current = now;
-        scrollToBottom(false);
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
       }
     }
-  }, [currentStreamingResponse, scrollToBottom]);
+  }, [currentStreamingResponse]);
 
   const streamResponse = async (userMessage: string, apiBase?: Message[]) => {
     setIsStreaming(true);

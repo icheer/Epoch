@@ -63,7 +63,7 @@ Epoch 支持丰富的 UI 组件类型：
 # 拉取镜像
 docker pull icheerme/epoch:latest
 
-# 运行容器
+# 使用 OpenAI 运行容器
 docker run -d \
   -p 3000:3000 \
   -e MODEL_NAME=gpt-4o-mini \
@@ -113,21 +113,21 @@ mv .env.example .env
 
 3. 打开 `.env` 并配置：
 
-#### 选项 A：使用 Ollama（本地、私密、免费）
-
-```env
-MODEL_NAME=llama3.2:3b
-USE_OLLAMA=true
-OLLAMA_API_URL=http://localhost:11434/api
-```
-
-#### 选项 B：使用 OpenAI（云端）
+#### 选项 A：使用 OpenAI（云端）
 
 ```env
 MODEL_NAME=gpt-4o-mini
 USE_OPENAI=true
 OPENAI_API_KEY=your_api_key_here
 OPENAI_API_URL=https://api.openai.com/v1
+```
+
+#### 选项 B：使用 Ollama（本地、私密、免费）
+
+```env
+MODEL_NAME=llama3.2:3b
+USE_OLLAMA=true
+OLLAMA_API_URL=http://localhost:11434/api
 ```
 
 #### 搜索提供商（必需 - 至少配置一个）
@@ -266,7 +266,7 @@ npm run dev
 ### 本 Fork 版本
 
 本版本在原项目基础上进行了以下改进：
-- ✨ 新增 Table 和 Blockquote 组件
+- ✨ 新增 Table、Blockquote 和 Checkbox 组件
 - 🎨 统一的 UI/UX 风格优化
 - 📝 侧边栏对话历史管理
 - 🐳 Docker 容器化部署支持

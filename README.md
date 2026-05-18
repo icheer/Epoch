@@ -253,15 +253,9 @@ npm run dev
 
 ## 致谢
 
-本项目 fork 自 [itzcrazykns/epoch](https://github.com/itzcrazykns/epoch)，感谢原作者的出色工作。
+本项目 fork 自 [itzcrazykns/epoch](https://github.com/itzcrazykns/epoch)，感谢原作者 itzcrazykns 的出色工作。
 
-### 原项目
-
-- **原作者**：itzcrazykns
-- **原项目地址**：[https://github.com/itzcrazykns/epoch](https://github.com/itzcrazykns/epoch)
-- **原作者联系方式**：
-  - 📧 邮箱：`kushagra20103[at]gmail.com`
-  - 💬 Discord：`itzcrazykns`
+**原项目地址**：[https://github.com/itzcrazykns/epoch](https://github.com/itzcrazykns/epoch)
 
 ### 本 Fork 版本
 
@@ -269,6 +263,8 @@ npm run dev
 - ✨ 新增 Table、Blockquote 和 Checkbox 组件
 - 🎨 统一的 UI/UX 风格优化
 - 📝 侧边栏对话历史管理
+- 🖼️ 图片前端缓存机制（30 分钟有效期，防重复请求）
+- 📱 PWA 支持（可添加到移动设备桌面，沉浸式体验）
 - 🐳 Docker 容器化部署支持
 - 🌐 兼容 OpenAI Completions API 格式
 - 🔧 新增 OPENAI_API_URL 环境变量配置

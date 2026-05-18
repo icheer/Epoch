@@ -380,7 +380,12 @@ export default function Home() {
                   <p className="text-black/50 dark:text-white/60 text-sm font-[450] mt-1">
                     {message.content as string}
                   </p>
-                  <div className="size-6 shrink-0 rounded-full bg-gray-200 dark:bg-gray-700 mt-0.5" />
+                  <div className="size-6 shrink-0 rounded-full bg-gray-200 dark:bg-gray-700 mt-0.5 flex items-center justify-center">
+                    <svg className="size-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="8" r="4" fill="currentColor" className="text-gray-400 dark:text-gray-500" />
+                      <path d="M6 21c0-3.314 2.686-6 6-6s6 2.686 6 6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="text-gray-400 dark:text-gray-500" />
+                    </svg>
+                  </div>
                 </div>
               )
             ) : (

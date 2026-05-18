@@ -66,7 +66,7 @@ docker pull icheerme/epoch:latest
 # 使用 OpenAI 运行容器
 docker run -d \
   -p 3000:3000 \
-  -e MODEL_NAME=gpt-4o-mini \
+  -e MODEL_NAME=gpt-5.5 \
   -e USE_OPENAI=true \
   -e OPENAI_API_KEY=your_api_key_here \
   -e OPENAI_API_URL=https://api.openai.com/v1 \
@@ -80,7 +80,7 @@ docker run -d \
 ```bash
 docker run -d \
   -p 3000:3000 \
-  -e MODEL_NAME=llama3.2:3b \
+  -e MODEL_NAME=qwen3.5:27b \
   -e USE_OLLAMA=true \
   -e OLLAMA_API_URL=http://host.docker.internal:11434/api \
   -e SEARXNG_API_URL=http://your-searxng-instance \
@@ -116,7 +116,7 @@ mv .env.example .env
 #### 选项 A：使用 OpenAI（云端）
 
 ```env
-MODEL_NAME=gpt-4o-mini
+MODEL_NAME=gpt-5.5
 USE_OPENAI=true
 OPENAI_API_KEY=your_api_key_here
 OPENAI_API_URL=https://api.openai.com/v1
@@ -125,7 +125,7 @@ OPENAI_API_URL=https://api.openai.com/v1
 #### 选项 B：使用 Ollama（本地、私密、免费）
 
 ```env
-MODEL_NAME=llama3.2:3b
+MODEL_NAME=qwen3.5:27b
 USE_OLLAMA=true
 OLLAMA_API_URL=http://localhost:11434/api
 ```

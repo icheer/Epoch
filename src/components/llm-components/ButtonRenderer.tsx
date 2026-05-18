@@ -38,8 +38,8 @@ export function ButtonRenderer({ component, onAction }: ButtonRendererProps) {
       onClick={handleClick}
       className={cn(
         "rounded-xl font-semibold transition-[filter,box-shadow,background-color,border-color,color] duration-200 cursor-pointer",
-        variantClasses[variant],
-        sizeClasses[size],
+        variantClasses[variant] || variantClasses.primary,
+        sizeClasses[size] || sizeClasses.md,
       )}
     >
       {label}

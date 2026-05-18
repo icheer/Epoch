@@ -36,7 +36,7 @@ export function AccordionRenderer({
         <AccordionItem
           key={index}
           value={`item-${index}`}
-          className="border border-b border-gray-200 rounded-lg px-4"
+          className="border border-gray-200 rounded-lg px-4 last:border-b"
         >
           <AccordionTrigger className="text-sm font-medium text-gray-700 hover:no-underline">
             {item.title || `Item ${index + 1}`}

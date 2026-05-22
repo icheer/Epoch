@@ -87,6 +87,7 @@ export default function Home() {
   const [formValues, setFormValues] = useState<Record<string, string>>({});
   const [retryState, setRetryState] = useState<RetryState | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const isStreamingRef = useRef(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const isNearBottomRef = useRef(true);
   const lastAutoScrollTime = useRef(0);
@@ -130,6 +131,8 @@ export default function Home() {
   }, [currentStreamingResponse]);
 
   const streamResponse = async (userMessage: string, apiBase?: Message[]) => {
+    if (isStreamingRef.current) return;
+    isStreamingRef.current = true;
     setIsStreaming(true);
     setCurrentStreamingResponse(null);
     setRetryState(null);
@@ -186,6 +189,7 @@ export default function Home() {
                 ]);
               }
               setCurrentStreamingResponse(null);
+              isStreamingRef.current = false;
               setIsStreaming(false);
               setFormValues({});
               return;
@@ -221,6 +225,7 @@ export default function Home() {
           },
         ]);
       }
+      isStreamingRef.current = false;
       setIsStreaming(false);
       setCurrentStreamingResponse(null);
     }
@@ -292,7 +297,7 @@ export default function Home() {
   };
 
   const handleSend = async () => {
-    if (!input.trim() || isStreaming) return;
+    if (!input.trim() || isStreamingRef.current) return;
     const userMessage = input.trim();
     setInput("");
     setMessages((prev) => [...prev, { role: "user", content: userMessage }]);
@@ -304,7 +309,7 @@ export default function Home() {
   };
 
   const handleRetry = async () => {
-    if (!retryState || isStreaming) return;
+    if (!retryState || isStreamingRef.current) return;
     const { userMessage, apiBase } = retryState;
     setRetryState(null);
     setMessages((prev) => prev.slice(0, -1));
@@ -312,13 +317,13 @@ export default function Home() {
   };
 
   const handleExamplePrompt = async (prompt: string) => {
-    if (isStreaming) return;
+    if (isStreamingRef.current) return;
     setMessages((prev) => [...prev, { role: "user", content: prompt }]);
     await streamResponse(prompt);
   };
 
   const handleButtonAction = async (action: string, label: string) => {
-    if (isStreaming) return;
+    if (isStreamingRef.current) return;
 
     let apiContent = `用户点击了按钮："${label}"`;
     if (Object.keys(formValues).length > 0) {

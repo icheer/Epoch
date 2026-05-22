@@ -79,7 +79,13 @@ export function CardRenderer({
     }
   }, [image, imageQuery, loadedQuery]);
 
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
+    // Prevent card click if clicking on interactive elements
+    const target = e.target as HTMLElement;
+    if (target.closest('button, a, input, select, textarea')) {
+      return;
+    }
+
     if (clickAction && onAction) {
       onAction(clickAction, title || "Card clicked");
     }
